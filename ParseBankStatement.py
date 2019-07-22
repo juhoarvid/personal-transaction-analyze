@@ -1,24 +1,39 @@
 import csv
-
-def get_csv_as_dict(path_to_csv):
-    with open(path_to_csv, mode='r') as csv_file:
-        csv_reader = csv.reader(csv_file, delimiter='\t')
-        for row in csv_reader:
-            try:
-                print(NordeaTransactionLine(*row))
-                print(NordeaTransactionLine(*row).__dict__)
-            except TypeError:
-                print("PASS:{}".format(row))
-                pass
-
+import collections
 
 class NordeaTransactionLine(object):
     def __init__(self, Kirjauspaiva, Arvopaiva, Maksupaiva, Maara,
         SaajaMaksaja, Tilinumero, BIC, Tapahtuma, Viite,
         MaksajanViite, Viesti, Kortinnumero, Kuitti, *args):
-        self.Kirjauspaiva = Kirjauspaiva
-        self.Maara = Maara
-        self.SaajaMaksaja = SaajaMaksaja
+        self.date = Kirjauspaiva
+        self.amount = Maara
+        self.source = SaajaMaksaja
 
-    def __str__(self):
-        return "{}:{}:{}".format(self.Kirjauspaiva, self.Maara, self.SaajaMaksaja)
+conf = {
+    'nordea' : {
+        'first_transaction_line' : 5,
+        'transcation_field_parser' : NordeaTransactionLine
+    }
+}
+
+def get_csv_as_dict(path_to_csv):
+    csv_list = []
+    with open(path_to_csv, mode='r') as csv_file:
+        csv_reader = csv.reader(csv_file, delimiter='\t')
+        csvline=1
+        for row in csv_reader:
+            if csvline < conf['nordea']['first_transaction_line']:
+                csvline+=1
+                continue
+            try:
+                csv_list.append(((conf['nordea']['transcation_field_parser'](*row).__dict__)))
+            except TypeError:
+                if row != []:
+                    print("PASS:{}".format(row))
+                pass
+    return csv_list
+
+def categorize_transaction(self, date, amount, source):
+    pass
+
+
