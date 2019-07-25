@@ -51,6 +51,14 @@ def check_category(source, categorize=True):
 
     category = [key for key, value in CATEGORIES.items() if source in value]
     if category == []:
+        if categorize:
+            request = {i:key for i,key in enumerate(CATEGORIES.keys())}
+            selection = input("For which category '{}' should be:{}".format(
+                source, request
+            ))
+            if selection not in request.keys():
+                RuntimeError("Wrong Selection")
+            
         return other
     else:
         return category[0]
@@ -62,9 +70,6 @@ if __name__ == '__main__':
     args = parser.parse_args()
     csv = get_csv_as_dict(args.csvfile)
     for ta in csv:
-        print(ta)
-        print(type(ta))
-        print(ta['source'])
         print(check_category(source=ta['source']))
 
 
