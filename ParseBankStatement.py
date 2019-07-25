@@ -1,5 +1,6 @@
 import csv
 import collections
+import argparse
 
 class NordeaTransactionLine(object):
     def __init__(self, Kirjauspaiva, Arvopaiva, Maksupaiva, Maara,
@@ -35,5 +36,12 @@ def get_csv_as_dict(path_to_csv):
 
 def categorize_transaction(self, date, amount, source):
     pass
+
+if __name__ == '__main__':
+    parser = argparse.ArgumentParser(description='Parse bank transactions')
+    parser.add_argument('csvfile', type=str,
+                        help='path to transaction csv file')
+    args = parser.parse_args()
+    print(get_csv_as_dict(args.csvfile))
 
 
