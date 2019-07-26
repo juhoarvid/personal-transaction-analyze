@@ -3,6 +3,7 @@ import collections
 import optparse
 import json
 import represent_categories
+import os
 
 
 
@@ -66,8 +67,9 @@ class categorize(object):
             if categorize:
                 request = {str(i):key for i,key in enumerate(self.CATEGORIES.keys())}
                 request["A"] = "ADD NEW CATEGORY"
-                selection = input("For which category '{}' should be:{}".format(
-                    source, request
+                selection = input("For which category '{}' should be:{}{}".format(
+                    source, os.linesep,
+                    "".join(["{}:{}{}".format(key, value, os.linesep) for key, value in request.items()])
                 ))
                 if selection not in request.keys():
                     print("Wrong selection! '{}' not in '{}'".format(
