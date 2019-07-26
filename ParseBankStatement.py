@@ -61,6 +61,7 @@ class categorize(object):
         other="Other"
 
         category = [key for key, value in self.CATEGORIES.items() if source in value]
+        print("CAT", category)
         if category == []:
             if categorize:
                 request = {str(i):key for i,key in enumerate(self.CATEGORIES.keys())}
@@ -101,13 +102,12 @@ if __name__ == '__main__':
     csv = cat.get_csv_as_dict(options.inputfile)
     for i, ta in enumerate(csv):
         category_known = [key for key, value in cat.CATEGORIES.items() if ta['source'] in value]
-        if category_known is not []:
+        if category_known != []:
+            print("CONTINUE",category_known, ta['source'] )
             continue
         category = cat.check_category(source=ta['source'])
         print(category)
         cat.CATEGORIES[category].append(ta['source'])
-        if i == 10:
-            break
     print(cat.CATEGORIES)
     with open(options.outputcatfile, 'w') as handle:
         handle.write(json.dumps(cat.CATEGORIES, indent=4, sort_keys=True))
@@ -124,7 +124,6 @@ if __name__ == '__main__':
         if ta_month not in years[ta_year].months.keys():
             years[ta_year].months[ta_month] = represent_categories.Month()
         ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['source'] in value][0]
-        print(ta_category)
         catsum=years[ta_year].months[ta_month].__dict__[ta_category]
         catsum = float(catsum) + float(transaction['amount'].replace(',','.'))
         years[ta_year].months[ta_month].__dict__[ta_category] = catsum
