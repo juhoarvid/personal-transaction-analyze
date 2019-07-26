@@ -1,5 +1,11 @@
 {
     "Ruoka" : [],
-    "Tavaratalo" : [],
-    "Auto" : []
+    "Auto:Polttoaine" : [],
+    "Auto:Huolto" : [],
+    "Kela" : [],
+    "Harrastus" : [],
+    "Laina" : [],
+    "Säästö" : [],
+    "Palkka" : [],
+    "Muut" : []
 }
