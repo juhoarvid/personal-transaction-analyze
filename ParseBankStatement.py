@@ -122,12 +122,12 @@ if __name__ == '__main__':
         ta_year = action_time.strftime("%Y")
         ta_month = action_time.strftime("%m")
         if ta_year not in years.keys():
-            years[ta_year] = represent_categories.Year()
+            years[ta_year] = represent_categories.Year(options.configurationfilepath, yearname=ta_year)
         if ta_month not in years[ta_year].months.keys():
-            years[ta_year].months[ta_month] = represent_categories.Month()
+            years[ta_year].months[ta_month] = represent_categories.Month(options.configurationfilepath)
         ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['source'] in value][0]
         catsum=years[ta_year].months[ta_month].__dict__[ta_category]
-        catsum = float(catsum) + float(transaction['amount'].replace(',','.'))
+        catsum = round(float(catsum) + float(transaction['amount'].replace(',','.')),2)
         years[ta_year].months[ta_month].__dict__[ta_category] = catsum
     for year in years.keys():
         print(year)
