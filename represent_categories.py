@@ -19,19 +19,25 @@ class Year(object):
         if self.months == {}:
             return True
         year = PrettyTable()
-        year.field_names = ["Category"]
+        
+        field_names = ["Category"]
         for monthname in self.months.keys():
-            year.field_names.append(monthname)
-        year.field_names.append("Total")
-        year.field_names.append("Average")
+            field_names.append(monthname)
+        field_names.append("Total")
+        field_names.append("Average")
+        year.field_names = field_names
         
         for category in self.categories:
             line = [category]
             category_values = []
             for month in self.months.keys():
-                category_values.append(self.months[month][category])
+                category_values.append(self.months[month].__dict__[category])
             line.extend(category_values)
-            line.append(tot(category_values))
-            line.append(int(tot(category_values)/len(category_values)))
+            line.append(sum(category_values))
+            if len(category_values) > 0:
+                avg=int(sum(category_values)/len(category_values))
+            else:
+                avg=0
+            line.append(avg)
             year.add_row(line)
         print(year)

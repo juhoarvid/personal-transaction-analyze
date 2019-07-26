@@ -6,7 +6,7 @@ year.field_names = ["Category", "Tammi", "Helmi", "Maalis", "Huhti", "Touko",
 #year.add_row(["Ruoka", 0, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, -12, "paljon", "ka"])
 
 print(year)
-
+print(year.field_names)
 import json
 import random
 
@@ -20,6 +20,7 @@ for cat in parsed.keys():
     line.extend(amounts)
     line.append(total)
     line.append(average)
+    print(line)
     year.add_row(line)
 print(year)
 

@@ -2,6 +2,7 @@ import csv
 import collections
 import optparse
 import json
+import represent_categories
 
 
 
@@ -23,7 +24,8 @@ class categorize(object):
     conf = {
         'nordea' : {
             'first_transaction_line' : 5,
-            'transcation_field_parser' : NordeaTransactionLine
+            'transcation_field_parser' : NordeaTransactionLine,
+            'timestampformat' : '%d.%m.%Y'
         }
     }
     def __init__(self, categoryinputfile):
@@ -98,8 +100,8 @@ if __name__ == '__main__':
     cat = categorize(options.configurationfilepath)
     csv = cat.get_csv_as_dict(options.inputfile)
     for i, ta in enumerate(csv):
-        category_known = [i for key, value in cat.CATEGORIES.items() if ta in value]
-        if category_known != []:
+        category_known = [key for key, value in cat.CATEGORIES.items() if ta['source'] in value]
+        if category_known is not []:
             continue
         category = cat.check_category(source=ta['source'])
         print(category)
@@ -109,5 +111,27 @@ if __name__ == '__main__':
     print(cat.CATEGORIES)
     with open(options.outputcatfile, 'w') as handle:
         handle.write(json.dumps(cat.CATEGORIES, indent=4, sort_keys=True))
+
+    ### PARSE TRANSACTION TO TIME
+    from datetime import datetime
+    years = {}
+    for transaction in csv:
+        action_time = datetime.strptime(transaction["date"], cat.conf["nordea"]["timestampformat"])
+        ta_year = action_time.strftime("%Y")
+        ta_month = action_time.strftime("%m")
+        if ta_year not in years.keys():
+            years[ta_year] = represent_categories.Year()
+        if ta_month not in years[ta_year].months.keys():
+            years[ta_year].months[ta_month] = represent_categories.Month()
+        ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['source'] in value][0]
+        print(ta_category)
+        catsum=years[ta_year].months[ta_month].__dict__[ta_category]
+        catsum = float(catsum) + float(transaction['amount'].replace(',','.'))
+        years[ta_year].months[ta_month].__dict__[ta_category] = catsum
+    for year in years.keys():
+        print(year)
+        years[year].print()
+
+        
 
 
