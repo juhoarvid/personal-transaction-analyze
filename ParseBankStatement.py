@@ -52,14 +52,23 @@ def check_category(source, categorize=True):
     category = [key for key, value in CATEGORIES.items() if source in value]
     if category == []:
         if categorize:
-            request = {i:key for i,key in enumerate(CATEGORIES.keys())}
+            request = {str(i):key for i,key in enumerate(CATEGORIES.keys())}
+            request["A"] = "ADD NEW CATEGORY"
             selection = input("For which category '{}' should be:{}".format(
                 source, request
             ))
             if selection not in request.keys():
-                RuntimeError("Wrong Selection")
-            
-        return other
+                print("Wrong selection! '{}' not in '{}'".format(
+                    selection, request.keys()
+                ))
+                return check_category(source, categorize)
+            elif selection == "A":
+                new_category=input("Give new gategory name:")
+                print("New category '{}' created".format(new_category))
+                CATEGORIES[new_category] = []
+                return new_category
+            else:
+                return request[selection]
     else:
         return category[0]
 
@@ -69,7 +78,17 @@ if __name__ == '__main__':
                         help='path to transaction csv file')
     args = parser.parse_args()
     csv = get_csv_as_dict(args.csvfile)
-    for ta in csv:
-        print(check_category(source=ta['source']))
+    for i, ta in enumerate(csv):
+        category_known = [i for key, value in CATEGORIES.items() if ta in value]
+        if category_known != []:
+            continue
+        category = check_category(source=ta['source'])
+        print(category)
+        CATEGORIES[category].append(ta['source'])
+        if i == 10:
+            break
+    print(CATEGORIES)
+    with open('cat_output.json', 'w') as handle:
+        handle.write(json.dumps(CATEGORIES, indent=4, sort_keys=True))
 
 
