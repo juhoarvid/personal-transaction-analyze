@@ -14,6 +14,8 @@ class NordeaTransactionLine(object):
         self.date = Kirjauspaiva
         self.amount = Maara
         self.source = SaajaMaksaja
+        self.msg = Viesti
+
 
 conf = {
     'nordea' : {
@@ -103,7 +105,14 @@ if __name__ == '__main__':
     cat = categorize(options.configurationfilepath)
     csv = cat.get_csv_as_dict(options.inputfile)
     for i, ta in enumerate(csv):
-        category_known = [key for key, value in cat.CATEGORIES.items() if ta['source'] in value]
+        category_known_source = [key for key, value in cat.CATEGORIES.items() if ta['source'] in value]
+        #TODO: Msg part needs different values to define correpsonding category, not same source from
+        #      configuration file
+        if ta['msg'] != '':
+            category_known_msg = [key for key, value in cat.CATEGORIES.items() if ta['msg'].strip() in value]
+        else:
+            category_known_msg = []
+        category_known = category_known_msg if category_known_msg != [] else category_known_source
         if category_known != []:
             #print("CONTINUE",category_known, ta['source'] )
             continue
@@ -125,7 +134,17 @@ if __name__ == '__main__':
             years[ta_year] = represent_categories.Year(options.configurationfilepath, yearname=ta_year)
         if ta_month not in years[ta_year].months.keys():
             years[ta_year].months[ta_month] = represent_categories.Month(options.configurationfilepath)
-        ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['source'] in value][0]
+        if transaction['msg'] != "":
+            ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['msg'].strip() in value]
+            if ta_category == []:
+                ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['source'] in value][0]
+            else:
+                ta_category = ta_category[0]
+                print(transaction, ta_category)
+        else:
+            ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['source'] in value][0]
+        ##DEBUG:
+        ##ta_category = [key for key, value in cat.CATEGORIES.items() if transaction['source'] in value][0]
         catsum=years[ta_year].months[ta_month].__dict__[ta_category]
         catsum = round(float(catsum) + float(transaction['amount'].replace(',','.')),2)
         years[ta_year].months[ta_month].__dict__[ta_category] = catsum
