@@ -23,12 +23,12 @@ class Year(object):
         if self.months == {}:
             return True
         year = PrettyTable()
-
+        
         field_names = ["Category"]
         for monthname in self.months.keys():
             field_names.append(monthname)
-        field_names.append("Total")
-        field_names.append("Average")
+        field_names.append("TOTAL")
+        field_names.append("AVG")
         year.field_names = field_names
         year.title = "upper"
 
@@ -55,4 +55,10 @@ class Year(object):
         totals.append(sum([value['total'] for category, value in self.categories.items()]))
         totals.append(sum([value['avg'] for category, value in self.categories.items()]))
         year.add_row(totals)
-        print(year.get_string(title=self.yearname))
+        year.align = 'l'
+
+        import prettytable, os
+        year.right_padding_width = 0
+
+        year_str = str(year.get_string(title=self.yearname))
+        print("{}".format(year_str))
